@@ -26,6 +26,8 @@ display:none;position:fixed;left:0;right:0;bottom:0;
 background:#fff;border-top:1px solid #ccc;padding:16px;z-index:998;
 box-shadow:0 -2px 10px rgba(0,0,0,.2);
 }
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.hint{color:#777;font-size:13px}
 </style>
 </head>
 <body>
@@ -33,22 +35,40 @@ box-shadow:0 -2px 10px rgba(0,0,0,.2);
 <header>DumpMind — Life Wiki</header>
 
 <main>
-<h3>Link GitHub Repo</h3>
-<input id="repo" placeholder="owner/repo"/>
-<input id="token" placeholder="ghp_xxxxx"/>
-<button id="save">Save</button>
+  <h3>Link GitHub Repo</h3>
+  <input id="repo" placeholder="owner/repo"/>
+  <input id="token" placeholder="ghp_xxxxx"/>
+  <button id="save">Save</button>
+  <p class="hint">Tip: your token & repo stay only on this device.</p>
 
-<h3 style="margin-top:32px;">Topics</h3>
-<input id="filter" placeholder="Search topics…"/>
-<button id="refresh">Refresh</button>
-<button id="newTopic">New Topic</button>
-<ul id="topicList"></ul>
+  <h3 style="margin-top:32px;">Topics</h3>
+  <input id="filter" placeholder="Search topics…"/>
+  <div class="toolbar">
+    <button id="refresh">Refresh</button>
+    <button id="newTopic">New Topic</button>
+    <button id="digestBtn">Daily Digest</button>
+    <button id="autofileBtn">Auto-file Today</button>
+    <button id="openImportBtn">Open Import</button>
+  </div>
+  <ul id="topicList"></ul>
 
-<div id="editorCard" style="display:none;margin-top:32px;">
-  <h3 id="edTitle"></h3>
-  <textarea id="editor" style="min-height:280px;"></textarea>
-  <button id="savePage">Save Page</button>
-</div>
+  <div id="editorCard" style="display:none;margin-top:32px;">
+    <h3 id="edTitle"></h3>
+    <textarea id="editor" style="min-height:280px;"></textarea>
+    <div class="toolbar">
+      <button id="savePage">Save Page</button>
+    </div>
+  </div>
+
+  <div class="card" id="importCard" style="margin-top:32px;">
+    <h3>Import from Landfill</h3>
+    <p class="hint">Paste curated lines (one per line). Choose a topic slug and append to its Notes.</p>
+    <input id="importTopic" placeholder="e.g. childhood"/>
+    <textarea id="importData" placeholder="Paste lines here…"></textarea>
+    <div class="toolbar">
+      <button id="importAppend">Append to Topic</button>
+    </div>
+  </div>
 </main>
 
 <!-- Dump button -->
@@ -56,10 +76,12 @@ box-shadow:0 -2px 10px rgba(0,0,0,.2);
 <div id="inboxModal">
   <h3>Quick Brain Dump</h3>
   <textarea id="inboxText" placeholder="Thought…"></textarea>
-  <button id="inboxSaveBtn">Save</button>
-  <button id="inboxCancelBtn">Cancel</button>
+  <div class="toolbar">
+    <button id="inboxSaveBtn">Save</button>
+    <button id="inboxCancelBtn">Cancel</button>
+  </div>
 </div>
 
-<script src="app.js?v=5"></script>
+<script src="app.js?v=300"></script>
 </body>
 </html>
