@@ -1,0 +1,1 @@
+console.log('App placeholder. UI will load.');

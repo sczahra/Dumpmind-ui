@@ -1,2 +1,0 @@
-# Dumpmind-ui
-Dumpmind ui
