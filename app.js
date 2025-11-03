@@ -1,75 +1,66 @@
-// basic config storage
 const $ = id => document.getElementById(id);
-const status = ()=>{};
+
+// load local config
 const cfg = JSON.parse(localStorage.getItem("dm_cfg")||"{}");
-function saveCfg(){ localStorage.setItem("dm_cfg", JSON.stringify(cfg)); }
-
-if($("repo")) $("repo").value = cfg.repo || "";
-if($("token")) $("token").value = cfg.token || "";
-
-$("save").onclick = () => {
+if($("repo")) $("repo").value = cfg.repo||"";
+if($("token")) $("token").value = cfg.token||"";
+$("save").onclick = ()=>{
   cfg.repo = $("repo").value.trim();
   cfg.token = $("token").value.trim();
-  saveCfg();
+  localStorage.setItem("dm_cfg",JSON.stringify(cfg));
   alert("Saved!");
 };
 
 // GitHub helper
-async function gh(path, opts={}) {
-  const resp = await fetch(
-    `https://api.github.com/repos/${cfg.repo}/${path}`,
-    { headers:{Authorization:`token ${cfg.token}`}, ...opts }
-  );
-  if(!resp.ok) throw new Error(await resp.text());
-  return resp.json();
+async function gh(p,o={}) {
+  const r = await fetch(`https://api.github.com/repos/${cfg.repo}/${p}`,{
+    headers:{Authorization:`token ${cfg.token}`},
+    ...o
+  });
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
 }
 
-// load topics
+// load topic index
 async function loadIndex(){
   try{
     const {content} = await gh("contents/wiki/index.json");
-    const data = JSON.parse(atob(content));
-    renderTopics(data.topics||[]);
-  } catch(e){ renderTopics([]); }
+    const d = JSON.parse(atob(content));
+    renderTopics(d.topics||[]);
+  }catch{ renderTopics([]); }
 }
-
-function renderTopics(list){
+function renderTopics(t){
   const q = ($("filter").value||"").toLowerCase();
-  $("topicList").innerHTML = "";
-  list.filter(t => (t.title||"").toLowerCase().includes(q))
-    .forEach(t=>{
-      const li = document.createElement("li");
-      const b = document.createElement("button");
-      b.textContent = t.title;
-      b.onclick = ()=>openTopic(t.slug);
-      li.appendChild(b);
-      $("topicList").appendChild(li);
+  $("topicList").innerHTML="";
+  (t||[]).filter(x=>x.title.toLowerCase().includes(q)).forEach(x=>{
+    const li=document.createElement("li");
+    const b=document.createElement("button");
+    b.textContent=x.title; b.onclick=()=>openTopic(x.slug);
+    li.appendChild(b); $("topicList").appendChild(li);
   });
 }
-
-$("refresh").onclick = loadIndex;
-$("filter").oninput = loadIndex;
-$("newTopic").onclick = ()=>openTopic(prompt("Topic slug?","new-topic"));
+$("refresh").onclick=loadIndex;
+$("filter").oninput=loadIndex;
+$("newTopic").onclick=()=>openTopic(prompt("Topic slug?","new-topic"));
 
 async function openTopic(slug){
   $("editorCard").style.display="block";
-  $("edTitle").textContent = slug;
-  $("editor").dataset.slug = slug;
-
+  $("edTitle").textContent=slug;
+  $("editor").dataset.slug=slug;
   try{
-    const f = await gh(`contents/wiki/topics/${slug}.md`);
+    const f=await gh(`contents/wiki/topics/${slug}.md`);
     $("editor").value = decodeURIComponent(escape(atob(f.content)));
-    $("editor").dataset.sha = f.sha;
+    $("editor").dataset.sha=f.sha;
   }catch{
-    $("editor").value = `# ${slug}\n\n## Notes\n- `;
-    $("editor").dataset.sha = null;
+    $("editor").value=`# ${slug}\n\n## Notes\n- `;
+    $("editor").dataset.sha=null;
   }
 }
 
-$("savePage").onclick = async () => {
-  const slug = $("editor").dataset.slug;
-  const sha = $("editor").dataset.sha;
-  const content = btoa(unescape(encodeURIComponent($("editor").value)));
+$("savePage").onclick = async ()=>{
+  const slug=$("editor").dataset.slug;
+  const sha=$("editor").dataset.sha;
+  const content=btoa(unescape(encodeURIComponent($("editor").value)));
   await gh(`contents/wiki/topics/${slug}.md`,{
     method:"PUT",
     body:JSON.stringify({message:`save ${slug}`,content,sha})
@@ -77,21 +68,20 @@ $("savePage").onclick = async () => {
   alert("Saved!");
 };
 
-// ==============
-// Float + inbox
-// ==============
-$("inboxBtn").onclick = ()=> $("inboxModal").style.display = "block";
+loadIndex();
+
+// ===== FLOATING + INBOX =====
+$("inboxBtn").onclick = ()=> $("inboxModal").style.display="block";
 $("inboxCancelBtn").onclick = ()=> {
-  $("inboxModal").style.display = "none"; $("inboxText").value="";
+  $("inboxText").value="";
+  $("inboxModal").style.display="none";
 };
-
-$("inboxSaveBtn").onclick = async () => {
-  const txt = $("inboxText").value.trim();
-  if(!txt) return;
-
-  const day = new Date().toISOString().slice(0,10);
-  const slug = `inbox-${day}`;
-  const path = `wiki/topics/${slug}.md`;
+$("inboxSaveBtn").onclick = async ()=>{
+  const t=($("inboxText").value||"").trim();
+  if(!t) return;
+  const day=new Date().toISOString().slice(0,10);
+  const slug=`inbox-${day}`;
+  const path=`wiki/topics/${slug}.md`;
 
   let sha=null,md="";
   try{
@@ -101,10 +91,8 @@ $("inboxSaveBtn").onclick = async () => {
   }catch{
     md = `# Inbox ${day}\n\n## Notes\n`;
   }
-
-  md += `\n- ${txt}`;
-  const content = btoa(unescape(encodeURIComponent(md)));
-
+  md += `\n- ${t}`;
+  const content=btoa(unescape(encodeURIComponent(md)));
   await gh(`contents/${path}`,{
     method:"PUT",
     body:JSON.stringify({message:`dump ${day}`,content,sha})
@@ -113,4 +101,3 @@ $("inboxSaveBtn").onclick = async () => {
   $("inboxModal").style.display="none";
   $("inboxText").value="";
 };
-loadIndex();
