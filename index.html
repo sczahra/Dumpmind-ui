@@ -1,1 +1,71 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DumpMind</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css"></head><body><h1>DumpMind Loading...</h1><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <title>DumpMind — Life Wiki</title>
+  <style>
+    :root{--bg:#fafafa;--fg:#111;--muted:#666;--border:#e5e5e5;--card:#fff}
+    *{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:#fff}
+    main{max-width:960px;margin:0 auto;padding:16px;display:grid;gap:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    input,textarea{width:100%;padding:8px;border:1px solid var(--border);border-radius:8px}
+    textarea{min-height:260px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    button{padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer}
+    ul{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+    .hint{color:var(--muted);font-size:12px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>DumpMind — Life Wiki</h1>
+  <div id="status"></div>
+</header>
+<main>
+  <section class="card">
+    <h2>Connect</h2>
+    <div class="row">
+      <label>Repo <input id="repo" placeholder="owner/repo" /></label>
+      <label>Token <input id="token" placeholder="ghp_..." /></label>
+      <button id="save">Save</button>
+    </div>
+    <p class="hint">Tip: open with <code>?repo=OWNER/REPO&token=YOUR_PAT</code> or paste above. Stored only on this device.</p>
+  </section>
+
+  <section class="card">
+    <h2>Topics</h2>
+    <div class="row">
+      <input id="filter" placeholder="Filter topics..."/>
+      <button id="refresh">Refresh</button>
+      <button id="newTopic">New Topic</button>
+    </div>
+    <ul id="topicList"></ul>
+  </section>
+
+  <section class="card" id="editorCard" style="display:none;">
+    <h2 id="edTitle">Editor</h2>
+    <textarea id="editor" spellcheck="false"></textarea>
+    <div class="row">
+      <button id="savePage">Save Page</button>
+    </div>
+  </section>
+
+  <section class="card" id="importCard">
+    <h2>Import from Landfill</h2>
+    <div class="hint">Paste curated lines (one per line). Choose a topic slug and append to its Facts.</div>
+    <div class="row">
+      <label>Topic <input id="importTopic" placeholder="e.g. childhood"/></label>
+    </div>
+    <textarea id="importData" placeholder="Paste lines here..."></textarea>
+    <div class="row">
+      <button id="importAppend">Append to Topic</button>
+    </div>
+  </section>
+</main>
+<footer><p style="text-align:center;color:#666;padding:12px">Reads/writes only <code>/wiki/**</code> in your private repo.</p></footer>
+<script src="app.js?v=2"></script>
+</body>
+</html>
